@@ -22,21 +22,35 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run(){
     try{
         await client.connect();
-        const userCollection = client.db("foodExpress").collection("user");
-        app.get ("/", (req, res)=>{
-            res.send();
+        const userCollection = client.db('foodExpress').collection('user');
+
+        app.get('/user', async(req, res)=>{
+            const query = {};
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+            res.send(users);
+        })
+
+
+
+
+        //post user : add a new user
+        app.post ('/user',  async(req, res)=>{
+            const newUser = req.body;
+            console.log('adding new user', newUser);
+            const result = await userCollection.insertOne(newUser)
+            res.send(result);
         });
     }
     finally{
-       
-    }
-}
+ 
+}};
 
 run().catch(console.dir);
 
 
-app.get ("/", (req, res)=>{
-    res.send("Running My Node CRUD Server");
+app.get ('/', (req, res)=>{
+    res.send('Running My Node CRUD Server');
 });
 
 app.listen(port, ()=>{
